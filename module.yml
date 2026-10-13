@@ -1,0 +1,72 @@
+#
+# robohub-linux — RoboHub platform for Linux hosts.
+#
+# Implements the robohub-common HAL and network contracts over POSIX, so a
+# gateway-only mode — a relay — runs, and is tested, on the machine it aggregates
+# from.
+#
+# @project RoboHub Platform
+# @license MIT
+#
+
+module:
+  name: robohub-linux
+  type: platform
+  version: 0.1.0
+  description: >
+    RoboHub platform for a Linux host: the console, the clock, a serial port and
+    sockets, over POSIX. A host has no OneWire, I2C, SPI or GPIO, so those
+    contracts are simply not registered and a smoke reports them as absent.
+
+  maintainer: "Aurel Miron"
+  license: "MIT"
+  created: "2026-10-13"
+
+platform: robohub
+
+hardware:
+  supported:
+    - native
+  presets: presets/
+
+build:
+  language: c
+  standard: c11
+  include_dirs:
+    - include/
+  sources:
+    - src/linux_platform.c
+    - src/linux_net.c
+
+depends:
+  - name: robohub-common
+    type: c
+    path: /home/miraur/projects/robohub-common
+    git: https://github.com/RoboHubPlatform/robohub-common
+    branch: main
+
+tests:
+  enabled: true
+  test_dirs:
+    - tests/
+  test_files:
+    - tests/test_linux_platform.c
+
+testing:
+  host_tests:
+    enabled: true
+    target_constraint: "native"
+
+package:
+  kind: library
+  binary: false
+
+metadata:
+  tags:
+    - platform
+    - linux
+    - posix
+    - host
+    - gateway
+  stability: experimental
+  visibility: public
