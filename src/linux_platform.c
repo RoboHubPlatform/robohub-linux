@@ -235,12 +235,32 @@ static RoboHubError serial_read(RoboHubUART* self, rh_u8* data, rh_size len)
 static LinuxSerial serial0 = { .fd = -1 };
 static LinuxSerial serial1 = { .fd = -1 };
 
+/** Copy whatever a tty has waiting, up to `max_len`; the poll a timed read and a
+ *  frame parser use. A host has no interrupt, so a non-blocking read is the
+ *  availability check. */
+static rh_size serial_read_available(RoboHubUART* self, rh_u8* data, rh_size max_len)
+{
+    if (self == 0 || self->context == 0 || data == 0 || max_len == 0u) {
+        return 0u;
+    }
+    LinuxSerial* serial = (LinuxSerial*)self->context;
+    if (serial->fd < 0) {
+        return 0u;
+    }
+    ssize_t got = read(serial->fd, data, max_len);
+    if (got <= 0) {
+        return 0u;
+    }
+    return (rh_size)got;
+}
+
 static RoboHubUART linux_uart0 = {
     .name = "uart0",
     .context = &serial0,
     .init = serial_init,
     .write = serial_write,
     .read = serial_read,
+    .read_available = serial_read_available,
 };
 
 static RoboHubUART linux_uart1 = {
@@ -249,6 +269,7 @@ static RoboHubUART linux_uart1 = {
     .init = serial_init,
     .write = serial_write,
     .read = serial_read,
+    .read_available = serial_read_available,
 };
 
 /* -------------------------------------------------------------------------- */
