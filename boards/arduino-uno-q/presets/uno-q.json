@@ -1,0 +1,7 @@
+{
+  "name": "uno-q",
+  "board": "uno-q",
+  "family": "host",
+  "core": "aarch64",
+  "target": "uno-q"
+}

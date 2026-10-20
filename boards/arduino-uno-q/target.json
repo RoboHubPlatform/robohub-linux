@@ -1,0 +1,53 @@
+{
+  "kind": "board",
+  "name": "uno-q",
+  "comment": "Arduino UNO Q: a Qualcomm QRB2210 (4x Cortex-A53, 2 GB RAM, 16 GB eMMC) running Debian, with an STM32U585 (Cortex-M33) companion MCU behind Arduino's flasher. It is one board with two halves reached two ways: a program for the Linux side is deployed over SSH and run, and firmware for the MCU is written by a probe. The deploy block and the flash block are both here, and the tool for each reads the one it is for.",
+  "board": "ARDUINO_UNO_Q",
+  "arch": "native",
+  "family": "host",
+  "core": "aarch64",
+  "preset": "uno-q",
+  "comment_toolchain": "the Linux side is an aarch64 Debian machine: build with the cross compiler on a workstation, or natively when the toolchain runs on the board itself; the memory map is the host's, so it inherits the host architecture and only names its compiler",
+  "toolchain": {
+    "compiler": "aarch64-linux-gnu-gcc",
+    "linker": "aarch64-linux-gnu-gcc"
+  },
+  "comment_deploy": "The Linux side is a host, so a program is copied to it and started, not written by a probe. The address is a fact about the bench, so RH_DEPLOY_HOST and its fellows override it.",
+  "deploy": {
+    "method": "rsync",
+    "host": "uno-q.local",
+    "port": 22,
+    "user": "arduino",
+    "path": "/home/arduino/apps",
+    "run": "cd {artifact} && ./{artifact}",
+    "comment": "rsync to the board and start the program; `rho deploy -docker` deploys a container image instead, using the docker block below",
+    "docker": {
+      "file": "Dockerfile",
+      "image": "robohub-gateway",
+      "tag": "latest",
+      "run": ["--net", "host", "-p", "8080:8080", "{image}"],
+      "comment": "a default for the gateway; the image, the tag, the Dockerfile and the run arguments belong to the project, so RH_DEPLOY_DOCKER_IMAGE, _TAG, _FILE and _RUN override them without editing a board spec"
+    }
+  },
+  "comment_flash": "The companion MCU is an STM32U585, reached by Arduino's own flasher. rho builds no firmware for it (that is the Arduino toolchain's), so this is the half that writes one that already exists.",
+  "flash": {
+    "tool": "arduino-flasher-cli",
+    "command": "arduino-flasher-cli upload --board uno-q {binary}",
+    "comment": "the platform ships tools/arduino-flasher-cli/flash, so the board is reached the same way on every machine"
+  },
+  "comment_pins": "The Linux side exposes the MCU to Linux over a serial link and a set of headers; the pins a Linux program names are those, not the MCU's GPIO.",
+  "pins": {
+    "uart_mcu_tx": {
+      "comment": "the serial line to the STM32U585 companion, from Linux"
+    },
+    "uart_mcu_rx": {
+      "comment": "the serial line from the STM32U585 companion, to Linux"
+    }
+  },
+  "peripherals": {
+    "uart_mcu": {
+      "instance": "uart",
+      "comment": "the serial link between the QRB2210 and the STM32U585"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+menu "Arduino UNO Q"
+
+config RH_BOARD_ARDUINO_UNO_Q
+    bool "Arduino UNO Q"
+    default n
+    help
+      The Arduino UNO Q: a Qualcomm QRB2210 running Debian (the platform this
+      module implements) with an STM32U585 companion MCU. A program for the
+      Linux side is deployed over SSH; firmware for the MCU is flashed with
+      arduino-flasher-cli.
+
+endmenu

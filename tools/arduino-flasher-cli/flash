@@ -1,0 +1,15 @@
+#!/bin/sh
+# Reaching an Arduino UNO Q's MCU with Arduino's own flasher.
+#
+# rho-flash prefers a platform entry point over a tool of the same name on PATH,
+# so the board is reached the same way on every machine. The arguments the
+# board's flash command rendered are passed to arduino-flasher-cli unchanged; a
+# machine without it says so here rather than failing somewhere deeper.
+set -eu
+
+if ! command -v arduino-flasher-cli >/dev/null 2>&1; then
+    echo "arduino-flasher-cli not found: install Arduino's flasher to write to the UNO Q's MCU" >&2
+    exit 127
+fi
+
+exec arduino-flasher-cli "$@"
