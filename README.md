@@ -42,3 +42,40 @@ ctest --test-dir build --output-on-failure
 
 The test brings the platform up as its own host: a clock that moves forward, no
 bus a host does not have, and a socket that reaches a loopback peer.
+
+## Boards
+
+A target is described by a spec under `boards/`, one per board. `native` is the
+machine the build runs on; `boards/arduino-uno-q/` is a board this platform
+reaches across a network and a USB cable.
+
+### Arduino UNO Q
+
+The UNO Q is one board with two halves: a Qualcomm QRB2210 (4x Cortex-A53, 2 GiB
+RAM, 16 GiB eMMC) running **Debian**, and an **STM32U585** (Cortex-M33) companion
+MCU. Its target spec carries **both** blocks, and each tool reads the one it is
+for:
+
+```sh
+# The Linux side: an aarch64 program copied over SSH and started.
+rho deploy -target uno-q -run build/gateway
+
+# The MCU: firmware written by Arduino's own flasher.
+rho flash -target uno-q build/firmware.bin
+```
+
+- **deploy** — `rsync` (or `scp`) to `arduino@uno-q.local:/home/arduino/apps`
+  and start it. The address is a fact about the bench: `RH_DEPLOY_HOST`,
+  `RH_DEPLOY_USER`, `RH_DEPLOY_PATH`, `RH_DEPLOY_PORT` and `RH_DEPLOY_METHOD`
+  override the spec. Adding a `docker` block to a project deploys a container
+  image instead of a file.
+- **flash** — `arduino-flasher-cli` writes firmware to the MCU. The platform
+  ships `tools/arduino-flasher-cli/flash`, so the board is reached the same way
+  on every machine. rho builds no firmware for the MCU; that is the Arduino
+  toolchain's, and this writes what it produced.
+
+Build for the board with the cross compiler (`aarch64-linux-gnu-gcc`, named in
+the spec), or natively when the toolchain runs on the board itself.
+
+The full bring-up — first boot, SSH, deploying a program and the gateway
+container, and flashing the MCU — is in [docs/uno-q.md](docs/uno-q.md).

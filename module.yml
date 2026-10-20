@@ -27,6 +27,8 @@ platform: robohub
 hardware:
   supported:
     - native
+    - uno-q
+  boards: boards/
   presets: presets/
 
 build:
@@ -44,6 +46,30 @@ depends:
     path: /home/miraur/projects/robohub-common
     git: https://github.com/RoboHubPlatform/robohub-common
     branch: main
+
+# What this platform needs on the machine it runs on, which is different from
+# what it depends on. Deploying a program to a board's Linux side is an SSH copy
+# and a start; flashing its MCU is Arduino's flasher; a gateway image is built
+# with Docker. rho doctor reads these and reports; nothing the toolchain fetches
+# produces them.
+system_deps:
+  executables:
+    - name: ssh
+      install:
+        apt: openssh-client
+        brew: openssh
+    - name: rsync
+      install:
+        apt: rsync
+        brew: rsync
+    - name: arduino-flasher-cli
+      version_flag: "--version"
+      install:
+        apt: arduino-flasher-cli
+    - name: docker
+      install:
+        apt: docker.io
+        brew: docker
 
 tests:
   enabled: true

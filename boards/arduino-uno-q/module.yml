@@ -1,0 +1,98 @@
+#
+# arduino-uno-q — Arduino UNO Q board support.
+#
+# The board is one thing with two halves: a Qualcomm QRB2210 running Debian —
+# which is the Linux platform this module implements — and an STM32U585
+# companion MCU. A program for the Linux side is built as an aarch64 program and
+# deployed over SSH; firmware for the MCU is built with Arduino's toolchain and
+# flashed with arduino-flasher-cli. The board's target spec carries both a
+# deploy block and a flash block, and each tool reads the one it is for.
+#
+# @project RoboHub Platform
+# @license MIT
+#
+
+module:
+  name: arduino-uno-q
+  type: platform-board
+  version: 0.1.0
+  description: >
+    Board support for the Arduino UNO Q (QRB2210 + STM32U585): the Linux side a
+    program is deployed to, and the companion MCU it is flashed with.
+
+  maintainer: "Aurel Miron"
+  license: "MIT"
+  created: "2026-10-20"
+
+hardware:
+  presets: presets/
+  target: target.json
+
+build:
+  language: c
+  standard: c11
+  # The board brings no sources of its own: the platform's POSIX sources are the
+  # program, and this board only says how it is built and reached.
+  sources: []
+
+config:
+  dialect: linux
+  kconfig_fragments:
+    - Kconfig
+
+board:
+  designation: ARDUINO_UNO_Q
+  mcu: STM32U585
+  family: QRB2210
+  core: Cortex-A53
+  preset: uno-q
+  target: uno-q
+  resources:
+    ram: 2 GiB
+    flash: 16 GiB eMMC
+  host:
+    os: debian
+    arch: aarch64
+  companion_mcu:
+    part: STM32U585
+    core: Cortex-M33
+  connectors:
+    - name: USB_C
+    - name: HEADERS
+    - name: DEBUG_SWD
+  programmer:
+    tool: arduino-flasher-cli
+    interface: usb
+  flash:
+    tool: arduino-flasher-cli
+    command: "arduino-flasher-cli upload --board uno-q {binary}"
+  deploy:
+    method: rsync
+    host: uno-q.local
+    port: 22
+    user: arduino
+    path: /home/arduino/apps
+    run: "cd {artifact} && ./{artifact}"
+  pins:
+    uart_mcu_tx: {}
+    uart_mcu_rx: {}
+  peripherals:
+    uart:
+      - name: uart_mcu
+        instance: uart
+
+package:
+  kind: library
+  binary: false
+
+metadata:
+  tags:
+    - board
+    - arduino
+    - uno-q
+    - linux
+    - debian
+    - stm32u585
+    - aarch64
+  stability: experimental
+  visibility: public
