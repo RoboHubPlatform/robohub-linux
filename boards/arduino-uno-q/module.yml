@@ -77,10 +77,8 @@ board:
     uart_mcu_tx: {}
     uart_mcu_rx: {}
   peripherals:
-    uart:
-      - name: uart_mcu
-        instance: uart
-
+    - name: uart_mcu
+      kind: uart
 package:
   kind: library
   binary: false
