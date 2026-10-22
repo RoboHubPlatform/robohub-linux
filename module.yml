@@ -96,3 +96,11 @@ metadata:
     - gateway
   stability: experimental
   visibility: public
+
+docs:
+  title: RoboHub Linux Platform
+  section: platforms
+  order: "40"
+  index: docs/index.md
+  sources:
+    - docs/index.md
