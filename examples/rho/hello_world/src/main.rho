@@ -1,0 +1,30 @@
+// hello_world — says hello, then says something every second.
+
+module main
+
+import ffi
+
+fn main() void {
+    if robohub_platform_init() != 0 {
+        return
+    }
+
+    let timer: Option[Ptr[RoboHubTimer]] = robohub_get_timer("system_timer")
+
+    print("\n")
+    print("Hello world, from a Linux board\n")
+    print("says something every second, from here on\n")
+    print("--------------------------------------\n")
+
+    let seconds: u32 = 0
+    while true {
+        seconds = seconds + 1
+        print("[")
+        print(string.from_i32(seconds as i32))
+        print(" s] hello from the board, in Rho\n")
+
+        if is_some(timer) {
+            rho_robohubtimer_delay_ms(value(timer), 1000)
+        }
+    }
+}

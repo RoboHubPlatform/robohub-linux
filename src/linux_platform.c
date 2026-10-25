@@ -22,6 +22,7 @@
 #include "error.h"
 #include "robohub/hal/console.h"
 #include "robohub/hal/timer.h"
+#include "robohub/hal/display.h"
 #include "robohub/hal/uart.h"
 
 #include <errno.h>
@@ -298,10 +299,109 @@ static void register_uart(RoboHubUART* uart, const char* name, const char* varia
 // then calls this — so the platform supplies the board hook and nothing else,
 // which is how every platform and the common library refer to each other without
 // a circular dependency between two archives.
+
+
+/* -------------------------------------------------------------------------- */
+/*  Display: the console, as a display                                        */
+/* -------------------------------------------------------------------------- */
+
+/* A display whose pixels are characters on a console. A host has no matrix of
+ * its own; what it has is a screen, and a program that writes to a display
+ * writes to the screen. */
+/* Forward declarations for the display operations. */
+static RoboHubError display_init(RoboHubDisplay* self);
+static RoboHubError display_deinit(RoboHubDisplay* self);
+static RoboHubError display_clear(RoboHubDisplay* self);
+static RoboHubError display_set_pixel(RoboHubDisplay* self, rh_u32 x, rh_u32 y, rh_u32 value);
+static RoboHubError display_get_pixel(RoboHubDisplay* self, rh_u32 x, rh_u32 y, rh_u32* value);
+static RoboHubError display_write_text(RoboHubDisplay* self, const char* text, rh_u32 x, rh_u32 y);
+static RoboHubError display_refresh(RoboHubDisplay* self);
+static RoboHubError display_set_brightness(RoboHubDisplay* self, rh_u32 level);
+
+static RoboHubDisplay linux_display = {
+    .name = "user_display",
+    .context = 0,
+    .width = 80,
+    .height = 24,
+    .format = ROBOHUB_DISPLAY_FORMAT_MONO,
+    .init = display_init,
+    .deinit = display_deinit,
+    .clear = display_clear,
+    .set_pixel = display_set_pixel,
+    .get_pixel = display_get_pixel,
+    .write_text = display_write_text,
+    .refresh = display_refresh,
+    .set_brightness = display_set_brightness,
+};
+
+static RoboHubError display_init(RoboHubDisplay* self)
+{
+    (void)self;
+    return ROBOHUB_OK;
+}
+
+static RoboHubError display_deinit(RoboHubDisplay* self)
+{
+    (void)self;
+    return ROBOHUB_OK;
+}
+
+static RoboHubError display_clear(RoboHubDisplay* self)
+{
+    (void)self;
+    (void)robohub_console_write_raw((const uint8_t*)"\033[2J\033[H", 7);
+    return ROBOHUB_OK;
+}
+
+static RoboHubError display_set_pixel(RoboHubDisplay* self, rh_u32 x, rh_u32 y, rh_u32 value)
+{
+    (void)self;
+    (void)x;
+    (void)y;
+    (void)value;
+    return ROBOHUB_OK;
+}
+
+static RoboHubError display_get_pixel(RoboHubDisplay* self, rh_u32 x, rh_u32 y, rh_u32* value)
+{
+    (void)self;
+    (void)x;
+    (void)y;
+    if (value != 0) {
+        *value = 0u;
+    }
+    return ROBOHUB_OK;
+}
+
+static RoboHubError display_write_text(RoboHubDisplay* self, const char* text, rh_u32 x, rh_u32 y)
+{
+    (void)self;
+    (void)x;
+    (void)y;
+    if (text == 0) {
+        return ROBOHUB_ERR_INVALID_ARG;
+    }
+    return robohub_console_puts(text);
+}
+
+static RoboHubError display_refresh(RoboHubDisplay* self)
+{
+    (void)self;
+    return ROBOHUB_OK;
+}
+
+static RoboHubError display_set_brightness(RoboHubDisplay* self, rh_u32 level)
+{
+    (void)self;
+    (void)level;
+    return ROBOHUB_OK;
+}
+
 RoboHubError robohub_board_register(void)
 {
     (void)robohub_console_init();
     (void)robohub_register_timer("system_timer", &linux_timer);
+    (void)robohub_register_display("user_display", &linux_display);
     register_uart(&linux_uart0, "uart0", "RHO_UART0");
     register_uart(&linux_uart1, "uart1", "RHO_UART1");
     return ROBOHUB_OK;

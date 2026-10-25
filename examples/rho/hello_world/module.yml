@@ -1,0 +1,54 @@
+module:
+  name: hello-world
+  type: module
+  version: 0.1.0
+  description: >
+    Says hello on an Arduino UNO Q board and writes a line to the console every
+    second.
+
+  maintainer: "Aurel Miron"
+  license: "MIT"
+  created: "2026-10-25"
+
+main: src/main.rho
+
+build:
+  language: c
+  output_dir: output
+  presets:
+    - uno-q
+
+depends:
+  - name: robohub-linux
+    type: c
+    path: /home/miraur/projects/robohub-linux
+    git: https://github.com/RoboHubPlatform/robohub-linux
+    branch: main
+
+c_connection:
+  library: "robohub-linux"
+  headers:
+    - platform.h
+    - console.h
+    - timer.h
+    - error.h
+    - types.h
+    - registry.h
+
+config:
+  dialect: linux
+  kconfig_fragments:
+    - Kconfig
+
+package:
+  kind: library
+  binary: false
+
+metadata:
+  tags:
+    - example
+    - linux
+    - uno-q
+    - aarch64
+  stability: experimental
+  visibility: public
