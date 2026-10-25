@@ -19,7 +19,7 @@
     "port": 22,
     "user": "arduino",
     "path": "/home/arduino/apps",
-    "run": "cd {artifact} && ./{artifact}",
+    "run": "{artifact}",
     "comment": "rsync to the board and start the program; `rho deploy -docker` deploys a container image instead, using the docker block below",
     "docker": {
       "file": "Dockerfile",
