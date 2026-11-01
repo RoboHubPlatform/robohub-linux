@@ -79,3 +79,7 @@ the spec), or natively when the toolchain runs on the board itself.
 
 The full bring-up — first boot, SSH, deploying a program and the gateway
 container, and flashing the MCU — is in [docs/uno-q.md](docs/uno-q.md).
+
+## Release history
+
+[CHANGELOG.md](CHANGELOG.md) — the changes in 0.2.0 and earlier releases.
