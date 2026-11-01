@@ -1,5 +1,7 @@
 # RoboHub Linux Platform
 
+**Version:** 0.2.0
+
 The Linux platform for the RoboHub ecosystem: the interfaces declared by
 `robohub-common`, implemented on Linux hosts, with board support packages
 for the Linux-based boards.
@@ -35,3 +37,31 @@ console every second.
 - `ssh` — for deploying to the board
 - `rsync` — for copying the program to the board
 - `aarch64-linux-gnu-gcc` — for cross-compiling
+
+## Deployment metadata
+
+The boards this platform carries say what a deployment may make of them and how
+the keeper reaches them:
+
+```yaml
+capabilities:
+  gateway: true
+  relay: true
+  node: false
+  host: true
+  wireless: true
+  links: "uart console usb wifi socket"
+  buses: "uart usb"
+
+deployment:
+  method: "adb"
+  arch: "arm64"
+  kconfig: "CONFIG_RH_BOARD_ARDUINO_UNO_Q=y"
+  apps_dir: "/home/arduino/apps"
+```
+
+`native` is the machine running the build or the keeper; it is a host with UART,
+USB, Ethernet, WiFi and socket links. The UNO Q is a host gateway with WiFi and
+USB; its Ethernet is added by the USB-C dongle the board doesn't carry yet. The
+keeper prefers ADB for the UNO Q when it is connected over USB, and SSH for a
+board reached over the network.

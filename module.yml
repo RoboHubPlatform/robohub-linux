@@ -12,7 +12,7 @@
 module:
   name: robohub-linux
   type: platform
-  version: 0.1.0
+  version: 0.2.0
   description: >
     RoboHub platform for a Linux host: the console, the clock, a serial port and
     sockets, over POSIX. A host has no OneWire, I2C, SPI or GPIO, so those

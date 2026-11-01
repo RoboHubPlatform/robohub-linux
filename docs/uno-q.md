@@ -107,6 +107,24 @@ and the platform ships `tools/arduino-flasher-cli/flash`, which `rho flash`
 prefers over a tool of the same name on `PATH` — so the board is reached the
 same way on every machine.
 
+## The UNO Q and the keeper
+
+The board's manifest says a deployment reaches the Linux side over ADB when it
+is on the USB cable:
+
+```yaml
+deployment:
+  method: "adb"
+  arch: "arm64"
+  apps_dir: "/home/arduino/apps"
+```
+
+The keeper uses that block to cross-build the gateway for `arm64`, push it to
+`/home/arduino/apps` over ADB, and start it. A board reached over the network
+uses its `ssh` deployment instead. The board is also a `host` gateway with
+`wireless` and `uart`/`usb` links; Ethernet arrives with the USB-C dongle and is
+declared then, not assumed now.
+
 ## Bring-up order
 
 1. `rho target show uno-q` resolves (the board spec is installed).

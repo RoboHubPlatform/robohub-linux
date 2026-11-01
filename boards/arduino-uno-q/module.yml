@@ -42,6 +42,7 @@ config:
 
 board:
   designation: ARDUINO_UNO_Q
+  summary: "The UNO Q Linux side: a Debian aarch64 host with WiFi, reached over SSH or ADB."
   mcu: STM32U585
   family: QRB2210
   core: Cortex-A53
@@ -79,6 +80,31 @@ board:
   peripherals:
     - name: uart_mcu
       kind: uart
+# What this board can be in a deployment. The keeper reads these at runtime, so
+# a gateway planner lists the boards that can do the job instead of a list
+# written into the planner. A host board gateways; it does not sense.
+capabilities:
+  gateway: true
+  relay: true
+  node: false
+  edge: false
+  host: true
+  wireless: true
+  ethernet: false
+  links: "uart console usb wifi socket"
+  buses: "uart usb"
+  deploy: "ssh adb docker"
+
+# How a deployment reaches this board. `adb` is the UNO Q's USB shell, `arm64`
+# is the architecture the gateway is cross-built for, and `apps_dir` is where
+# a pushed gateway is started. A board that speaks SSH says `ssh` here and the
+# keeper uses the host and user saved in the network step.
+deployment:
+  kconfig: "CONFIG_RH_BOARD_ARDUINO_UNO_Q=y"
+  method: "adb"
+  arch: "arm64"
+  apps_dir: "/home/arduino/apps"
+
 package:
   kind: library
   binary: false
