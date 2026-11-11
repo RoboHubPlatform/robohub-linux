@@ -42,6 +42,7 @@ build:
   sources:
     - src/linux_platform.c
     - src/linux_net.c
+    - src/linux_nonce.c
 
 depends:
   - name: robohub-common

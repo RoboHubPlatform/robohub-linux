@@ -28,6 +28,14 @@
 
 int main(void)
 {
+    /* Nonces: filled, and never the same twice. */
+    {
+        rh_u8 first[8], second[8];
+        assert(robohub_platform_nonce(first, sizeof(first)) == 0);
+        assert(robohub_platform_nonce(second, sizeof(second)) == 0);
+        assert(memcmp(first, second, sizeof(first)) != 0);
+    }
+
     /* The platform's own console: a program built with this platform reaches it,
      * which is what puts the platform object in the link. A static archive is
      * pulled by what refers to it, so a platform the program never touches is a

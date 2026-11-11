@@ -56,6 +56,7 @@ endif()
 add_library(robohub-linux STATIC
     src/linux_platform.c
     src/linux_net.c
+    src/linux_nonce.c
 )
 
 target_include_directories(robohub-linux PUBLIC
