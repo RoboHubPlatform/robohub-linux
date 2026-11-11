@@ -1,0 +1,9 @@
+# robohub-linux's tests, declared. The platform brings itself up as its own host,
+# so its tests run on the machine doing the build; `rho test` configures, builds
+# and runs them with the ctest kind.
+name: robohub-linux
+suites:
+  - name: unit
+    kind: ctest
+    tags: [unit, host]
+    ctest: {}

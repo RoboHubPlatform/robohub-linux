@@ -35,10 +35,11 @@ tree, or the sender of an uplink — without a board in it.
 ## Build and test
 
 ```sh
-cmake -S . -B build -DRHO_BUILD_HOST_TESTS=ON
-cmake --build build
-ctest --test-dir build --output-on-failure
+rho test .
 ```
+
+`tests/tests.yml` declares the suite; the `ctest` kind configures, builds and runs
+it with the host tests switched on.
 
 The test brings the platform up as its own host: a clock that moves forward, no
 bus a host does not have, and a socket that reaches a loopback peer.
