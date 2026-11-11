@@ -1,6 +1,8 @@
 module:
   name: hello-world
-  id: robohub-linux.examples.c.hello_world
+  id: robohub.example.hello-world-linux-c
+  previous_ids:
+    - robohub-linux.examples.c.hello_world
   type: module
   version: 0.1.0
   description: >

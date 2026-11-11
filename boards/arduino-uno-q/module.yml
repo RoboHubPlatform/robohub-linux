@@ -14,7 +14,9 @@
 
 module:
   name: arduino-uno-q
-  id: robohub-linux.boards.arduino-uno-q
+  id: robohub.platform-board.arduino-uno-q
+  previous_ids:
+    - robohub-linux.boards.arduino-uno-q
   type: platform-board
   version: 0.1.0
   description: >
