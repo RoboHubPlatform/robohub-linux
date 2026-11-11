@@ -1,5 +1,6 @@
 module:
   name: hello-world
+  id: robohub-linux.examples.rho.hello_world
   type: module
   version: 0.1.0
   description: >

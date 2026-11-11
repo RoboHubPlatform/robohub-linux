@@ -11,6 +11,7 @@
 
 module:
   name: robohub-linux
+  id: robohub-linux
   type: platform
   version: 0.2.0
   description: >
