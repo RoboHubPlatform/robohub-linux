@@ -22,7 +22,7 @@ build:
 depends:
   - name: robohub-linux
     type: c
-    path: ${RHO_WORKSPACE}/robohub-linux
+    path: ${ROBOHUB_WORKSPACE}/robohub-linux
     git: https://github.com/RoboHubPlatform/robohub-linux
     branch: main
 
