@@ -58,6 +58,13 @@ depends:
 # produces them.
 system_deps:
   executables:
+    # The UNO Q's Linux side is arm64; a build for it on another machine is a
+    # cross build.
+    - name: aarch64-linux-gnu-gcc
+      version_flag: "--version"
+      install:
+        apt: gcc-aarch64-linux-gnu
+        brew: aarch64-unknown-linux-gnu
     - name: ssh
       install:
         apt: openssh-client
