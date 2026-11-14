@@ -1,7 +1,5 @@
 # RoboHub Linux Platform
 
-**Version:** 0.2.0
-
 The Linux platform for the RoboHub ecosystem: the interfaces declared by
 `robohub-common`, implemented on Linux hosts, with board support packages
 for the Linux-based boards.
@@ -65,3 +63,11 @@ USB, Ethernet, WiFi and socket links. The UNO Q is a host gateway with WiFi and
 USB; its Ethernet is added by the USB-C dongle the board doesn't carry yet. The
 keeper prefers ADB for the UNO Q when it is connected over USB, and SSH for a
 board reached over the network.
+
+## Arduino UNO Q
+
+The UNO Q is two machines on one board: a Linux side that is deployed to, and a
+microcontroller that is flashed. The {ref}`bring-up runbook <robohub-linux/uno-q>` takes it from
+the box to a running program: reaching the board over USB (ADB) or the network
+(SSH), deploying a program or a container to its Linux side, and flashing its
+MCU.
