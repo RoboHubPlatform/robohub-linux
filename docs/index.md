@@ -71,3 +71,19 @@ microcontroller that is flashed. The {ref}`bring-up runbook <robohub-linux/uno-q
 the box to a running program: reaching the board over USB (ADB) or the network
 (SSH), deploying a program or a container to its Linux side, and flashing its
 MCU.
+
+## The device keystore
+
+On a Linux host the rotated device key (`robohub/keystore.h`) is one file, mode
+0600, holding the two A/B records of `robohub/keystore_core.h`. A write never
+changes it in place: the new contents go to `<file>.tmp` (created 0600 and
+fsync'd), which is renamed over the file before the directory is fsync'd, so a
+crash leaves the old file or the new one. The file is, first that is set:
+
+| Variable | File |
+|---|---|
+| `RH_KEYSTORE_FILE` | that file |
+| `RH_STATE_DIR` | `<dir>/keystore.bin` |
+| `RH_SECURE_KEY_FILE` | `<key file>.keystore`, beside the key it supersedes |
+
+With none set there is no store, the same answer as the weak default.

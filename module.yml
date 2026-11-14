@@ -15,7 +15,7 @@ module:
   previous_ids:
     - robohub-linux
   type: platform
-  version: 0.2.0
+  version: 0.3.0
   description: >
     RoboHub platform for a Linux host: the console, the clock, a serial port and
     sockets, over POSIX. A host has no OneWire, I2C, SPI or GPIO, so those
@@ -43,6 +43,7 @@ build:
     - src/linux_platform.c
     - src/linux_net.c
     - src/linux_nonce.c
+    - src/linux_keystore.c
 
 depends:
   - name: robohub-common
@@ -88,6 +89,7 @@ tests:
     - tests/
   test_files:
     - tests/test_linux_platform.c
+    - tests/test_linux_keystore.c
 
 testing:
   host_tests:

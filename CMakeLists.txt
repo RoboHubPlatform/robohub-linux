@@ -57,6 +57,7 @@ add_library(robohub-linux STATIC
     src/linux_platform.c
     src/linux_net.c
     src/linux_nonce.c
+    src/linux_keystore.c
 )
 
 target_include_directories(robohub-linux PUBLIC
@@ -68,6 +69,13 @@ target_include_directories(robohub-linux PUBLIC
 )
 
 target_link_libraries(robohub-linux PUBLIC robohub-common)
+
+# The device keystore's strong implementation is taken from this archive on
+# every link, whatever order the archives come in: the platform's keystore
+# object defines `rh_keystore_platform`, which nothing else defines, so naming it
+# undefined pulls that object in, and its rh_keystore_load/store override the
+# weak defaults in robohub-common even if those were seen first.
+target_link_options(robohub-linux INTERFACE "LINKER:--undefined=rh_keystore_platform")
 target_compile_features(robohub-linux PUBLIC c_std_11)
 
 # ---------------------------------------------------------------------------
@@ -81,6 +89,9 @@ if(PROJECT_IS_TOP_LEVEL AND RHO_BUILD_HOST_TESTS AND NOT RHO_TARGET_IS_BAREMETAL
   add_executable(robohub-linux-test-platform tests/test_linux_platform.c)
   target_link_libraries(robohub-linux-test-platform PRIVATE robohub-linux)
   add_test(NAME robohub-linux-test-platform COMMAND robohub-linux-test-platform)
+  add_executable(robohub-linux-test-keystore tests/test_linux_keystore.c)
+  target_link_libraries(robohub-linux-test-keystore PRIVATE robohub-linux)
+  add_test(NAME robohub-linux-test-keystore COMMAND robohub-linux-test-keystore)
 endif()
 
 # ---------------------------------------------------------------------------
