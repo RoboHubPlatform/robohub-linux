@@ -140,6 +140,31 @@ needs it on the USB cable. To reach it over the network, deploy with
 `wireless` and `uart`/`usb` links; Ethernet arrives with the USB-C dongle and is
 declared then, not assumed now.
 
+## Plugging in a USB device
+
+The Linux side has **one USB-C port**, which switches between device (the cable
+to the workstation, ADB) and host. A USB device — a Zigbee coordinator such as
+the Sonoff ZBDongle-E, a USB serial adapter — is plugged in through a **powered
+USB-C hub** on that port, never straight into it: the hub, on its own power
+supply, powers the device.
+
+**Host mode is not enabled when the board is powered from its 5V or VIN pin.**
+Powered that way, the port stays a device port until the **JCTL** header is set
+as Arduino describes in [UNO Q host
+mode](https://docs.arduino.cc/tutorials/uno-q/host-mode/). Check that the board
+sees the device:
+
+```sh
+ssh arduino@uno-q.local lsusb
+ssh arduino@uno-q.local 'ls -l /dev/serial/by-id/'
+```
+
+The board manifest declares `usb_host: true` (LNX-0008), which is what RoboHub
+Mesh looks for before it offers the board as a place for a USB Zigbee
+coordinator; Mesh then runs Zigbee2MQTT for it on the board, as a container. The
+user that runs it (`arduino`) must be in the group that owns the serial device,
+`dialout` on the board's Debian (`sudo usermod -aG dialout arduino`).
+
 ## Bring-up order
 
 1. `rho target show uno-q` resolves (the board spec is installed).
@@ -158,4 +183,5 @@ declared then, not assumed now.
 | `rsync`/`ssh` cannot reach the board | the address: `RH_DEPLOY_HOST`, the login, and that the key is installed |
 | The container starts but the gateway reads nothing | the serial device is not in the run arguments (`--device`) |
 | `rho flash` cannot find the flasher | `arduino-flasher-cli` is not on `PATH`; the platform's `tools/` entry says so |
+| A USB device plugged into the board does not appear in `lsusb` | it is not on a powered USB-C hub, or the board is powered from 5V/VIN without the JCTL header set for host mode |
 | The cross build fails | `aarch64-linux-gnu-gcc` is not installed, or build on the board instead |

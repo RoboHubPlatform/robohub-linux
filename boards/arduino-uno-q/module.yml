@@ -18,7 +18,7 @@ module:
   previous_ids:
     - robohub-linux.boards.arduino-uno-q
   type: platform-board
-  version: 0.1.0
+  version: 0.2.0
   description: >
     Board support for the Arduino UNO Q (QRB2210 + STM32U585): the Linux side a
     program is deployed to, and the companion MCU it is flashed with.
@@ -95,6 +95,11 @@ capabilities:
   node: false
   edge: false
   host: true
+  # The Linux side's one USB-C port switches roles, so a USB device — a Zigbee
+  # coordinator — is plugged in through a powered USB-C hub. Declared, not read
+  # from `buses: usb`, which is the port as a device and the console; host mode
+  # needs the JCTL header when the board is powered from 5V or VIN (LNX-0008).
+  usb_host: true
   wireless: true
   ethernet: false
   links: "uart console usb wifi socket"

@@ -120,3 +120,20 @@ requirements:
     owner: maintainer
     changed: 2026-11-19
     tags: [system-deps]
+
+  - id: LNX-0008
+    title: The UNO Q says it can host a USB device
+    statement: >
+      The UNO Q board's manifest shall declare `usb_host: true` among its
+      capabilities, and its documentation shall say that a USB device is plugged
+      in through a powered USB-C hub on the board's USB-C port, and that host mode
+      is not enabled when the board is powered from its 5V or VIN pin until the
+      JCTL header is set as Arduino describes.
+    rationale: Mesh places a USB Zigbee coordinator only under a board that declares a USB host (robohub:ADR-0017); the UNO Q's Linux side has one, through role switching on its single USB-C port, with a power caveat a person must know.
+    satisfies: [SYS-0069]
+    decided_by: [robohub:ADR-0017]
+    status: approved
+    verification: inspection
+    owner: maintainer
+    changed: 2026-11-20
+    tags: [capabilities, usb, uno-q]

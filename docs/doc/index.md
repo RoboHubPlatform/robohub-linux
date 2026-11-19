@@ -47,6 +47,7 @@ capabilities:
   relay: true
   node: false
   host: true
+  usb_host: true
   wireless: true
   links: "uart console usb wifi socket"
   buses: "uart usb"
@@ -61,6 +62,15 @@ deployment:
 `native` is the machine running the build or the keeper; it is a host with UART,
 USB, Ethernet, WiFi and socket links. The UNO Q is a host gateway with WiFi and
 USB; its Ethernet is added by the USB-C dongle the board doesn't carry yet.
+
+`usb_host: true` says the board can host a USB device, such as a Zigbee
+coordinator, which Mesh places only under a board declaring `host` and
+`usb_host` (robohub ADR-0017). It is declared, never inferred from `buses: usb`,
+which is a USB device port or a serial console. On the UNO Q the device is
+plugged in through a **powered USB-C hub** on the board's one USB-C port; host
+mode is not enabled when the board is powered from its 5V or VIN pin until the
+JCTL header is set as Arduino describes (see the
+{ref}`bring-up runbook <robohub-linux/uno-q>`).
 
 Two tools deploy to the UNO Q, from two blocks. `rho deploy` reads the target
 spec's `deploy` block (`boards/arduino-uno-q/target.json`) and copies a program
