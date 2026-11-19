@@ -397,6 +397,7 @@ static RoboHubError display_set_brightness(RoboHubDisplay* self, rh_u32 level)
     return ROBOHUB_OK;
 }
 
+// @req LNX-0001
 RoboHubError robohub_board_register(void)
 {
     (void)robohub_console_init();

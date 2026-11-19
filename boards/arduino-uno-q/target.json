@@ -25,8 +25,9 @@
       "file": "Dockerfile",
       "image": "robohub-gateway",
       "tag": "latest",
-      "run": ["--net", "host", "-p", "8080:8080", "{image}"],
-      "comment": "a default for the gateway; the image, the tag, the Dockerfile and the run arguments belong to the project, so RH_DEPLOY_DOCKER_IMAGE, _TAG, _FILE and _RUN override them without editing a board spec"
+      "run": ["--net", "host", "{image}"],
+      "comment": "a default for the gateway; the image, the tag, the Dockerfile and the run arguments belong to the project, so RH_DEPLOY_DOCKER_IMAGE, _TAG, _FILE and _RUN override them without editing a board spec. Host networking, not a port mapping: the gateway serves REST_PORT (8080), may listen on UPLINK_PORT and sends its UDP stream to a collector on the board itself, all of which a container on the host's network reaches as they are; with --net host docker discards any -p, so none is given",
+      "comment_run": "{artifact} is the full path the program was copied to (path joined with the artifact's file name), so the program is started by that path alone"
     }
   },
   "comment_flash": "The companion MCU is an STM32U585, reached by Arduino's own flasher. rho builds no firmware for it (that is the Arduino toolchain's), so this is the half that writes one that already exists.",

@@ -3,7 +3,16 @@
 # and runs them with the ctest kind.
 name: robohub-linux
 suites:
+  # @verifies LNX-0001, LNX-0002, LNX-0003, LNX-0004, LNX-0005
   - name: unit
     kind: ctest
     tags: [unit, host]
     ctest: {}
+  # The UNO Q's deploy block is the same in target.json, which rho deploy reads,
+  # and in the board manifest; its start command is one rho-deploy can run, and
+  # the container defaults publish no port under host networking.
+  # @verifies LNX-0006
+  - name: uno-q-deploy
+    kind: command
+    tags: [unit, host, deploy]
+    command: [python3, tests/uno_q_deploy.py]

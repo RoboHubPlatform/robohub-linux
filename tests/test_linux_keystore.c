@@ -36,6 +36,7 @@ static void expect_key(uint32_t epoch)
     assert(memcmp(got.key, want.key, 16) == 0);
 }
 
+// @verifies LNX-0004, LNX-0005
 int main(void)
 {
     const char *base = getenv("TMPDIR");

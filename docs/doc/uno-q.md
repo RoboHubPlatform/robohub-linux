@@ -63,8 +63,10 @@ rho deploy -target uno-q -run build/output/<program>
 rho deploy -target uno-q build/output/<program>
 ```
 
-The board's `deploy` block copies to `/home/arduino/apps` and starts the program
-with `cd {artifact} && ./{artifact}`. `rho deploy -n` prints every step first.
+The board's `deploy` block copies the program with rsync over SSH (port 22, as
+`arduino`) to `/home/arduino/apps` and starts it over SSH with `{artifact}`,
+which `rho deploy` replaces with the full path it was copied to
+(`/home/arduino/apps/<program>`). `rho deploy -n` prints every step first.
 
 ## Deploying the gateway as a container
 
@@ -84,9 +86,17 @@ A gateway that reads a board's serial link needs the device even in a container,
 and the run arguments are the project's:
 
 ```sh
-RH_DEPLOY_DOCKER_RUN='--net host --device /dev/ttyUSB0 -p 8080:8080 {image}' \
+RH_DEPLOY_DOCKER_RUN='--net host --device /dev/ttyUSB0 {image}' \
     rho deploy -target uno-q -docker -run build/robohub-gateway
 ```
+
+The container runs on the board's own network (`--net host`) rather than behind
+a port mapping. The gateway serves `REST_PORT` (8080), may listen on
+`UPLINK_PORT` for the gateways and boards below it, and sends its UDP stream to a
+collector at `127.0.0.1` by default — with host networking each of those is the
+board's own port and address, as it would be without a container, and a port
+changed in the environment needs no change to the run arguments. Docker discards
+a `-p` given with `--net host`, so the default gives none.
 
 The image name, tag and Dockerfile default from the board's `deploy.docker`
 block (`robohub-gateway:latest`, `Dockerfile`) and can be overridden with
@@ -107,10 +117,12 @@ and the platform ships `tools/arduino-flasher-cli/flash`, which `rho flash`
 prefers over a tool of the same name on `PATH` — so the board is reached the
 same way on every machine.
 
-## The UNO Q and the keeper
+## The UNO Q and Mesh
 
-The board's manifest says a deployment reaches the Linux side over ADB when it
-is on the USB cable:
+`rho deploy` above copies over SSH with rsync, from the target spec's `deploy`
+block. RoboHub Mesh, when it starts a gateway on the board, reads a different
+block — the board manifest's `deployment` — and that one says ADB, over the USB
+cable:
 
 ```yaml
 deployment:
@@ -119,9 +131,12 @@ deployment:
   apps_dir: "/home/arduino/apps"
 ```
 
-The keeper uses that block to cross-build the gateway for `arm64`, push it to
-`/home/arduino/apps` over ADB, and start it. A board reached over the network
-uses its `ssh` deployment instead. The board is also a `host` gateway with
+Mesh uses that block to cross-build the gateway for `arm64`, push it to
+`/home/arduino/apps` over ADB, and start it there. It takes the method the
+manifest names and nothing else: a board whose `deployment.method` is `ssh` is
+copied with scp to its `deployment.path`, but the UNO Q's is `adb`, so Mesh
+needs it on the USB cable. To reach it over the network, deploy with
+`rho deploy` (SSH, as above). The board is also a `host` gateway with
 `wireless` and `uart`/`usb` links; Ethernet arrives with the USB-C dongle and is
 declared then, not assumed now.
 

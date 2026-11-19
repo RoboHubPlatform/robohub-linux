@@ -44,6 +44,7 @@ const char rh_keystore_platform[] = "linux";
 #endif
 
 /* The keystore file's path, or -1 when nothing names one. */
+// @req LNX-0004
 static int keystore_path(char *out, size_t size)
 {
     const char *file = getenv("RH_KEYSTORE_FILE");
@@ -62,6 +63,7 @@ static int keystore_path(char *out, size_t size)
 }
 
 /* The whole file into `buf`; a missing or short file reads as erased. */
+// @req LNX-0005
 static int read_all(const char *path, uint8_t *buf)
 {
     memset(buf, 0xFF, LINUX_KEYSTORE_BYTES);
@@ -129,6 +131,7 @@ static int linux_read(void *ctx, unsigned slot, uint8_t *buf, size_t len)
     return 0;
 }
 
+// @req LNX-0005
 static int linux_write(void *ctx, unsigned slot, const uint8_t *buf, size_t len)
 {
     const char *path = (const char *)ctx;

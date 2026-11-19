@@ -1,0 +1,122 @@
+# What the Linux platform gives RoboHub: the robohub-common contracts over POSIX,
+# so the runtime, the transport and a relay run on a host, the host keystore,
+# the UNO Q board's deploy and flash facts, and what it needs on the machine
+# (src/linux_platform.c, linux_net.c, linux_nonce.c, linux_keystore.c,
+# boards/arduino-uno-q/, module.yml). Written in the R5 backfill from the
+# documentation, the changelog, the code and the host tests; proposed until the
+# maintainer approves them.
+level: NODE
+prefix: LNX
+title: Linux platform
+requirements:
+  - id: LNX-0001
+    title: A host registers what it has and nothing it lacks
+    statement: >
+      On robohub_platform_init the Linux platform shall bring up the console on
+      standard output and register one clock named `system_timer` on CLOCK_MONOTONIC, a
+      display named `user_display` drawn on the console, and `uart0` / `uart1`
+      only when RHO_UART0 / RHO_UART1 name a tty, and shall register no OneWire,
+      I2C, SPI or GPIO device.
+    rationale: A relay runs the board's runtime on the machine it aggregates from; a bus a host has no answer for must be absent, not a device that fails when used.
+    satisfies: [SYS-0046]
+    status: proposed
+    verification: test
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [hal, host, relay]
+
+  - id: LNX-0002
+    title: The network contract is POSIX sockets
+    statement: >
+      The Linux platform shall report its network as connected from the start,
+      answer robohub_net_ip with an address, and implement the socket contract
+      with non-blocking BSD sockets, so that a TCP socket connects to a peer,
+      sends whole buffers and returns ROBOHUB_SOCKET_TIMEOUT from a receive that
+      gets nothing within its timeout.
+    rationale: The uplink a relay dials is the same code on a board and on a host; only the platform beneath it changes.
+    satisfies: [SYS-0046, SYS-0048]
+    status: proposed
+    verification: test
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [network, host, relay]
+
+  - id: LNX-0003
+    title: Nonces come from the kernel
+    statement: >
+      robohub_platform_nonce on Linux shall fill the whole buffer from
+      getrandom(2) and return -1 when the kernel gives no bytes, so that two
+      nonces asked for in a row differ.
+    rationale: A session's freshness rests on a nonce that never repeats, also across a restart.
+    satisfies: [SYS-0020, SYS-0023]
+    status: proposed
+    verification: test
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [security, nonce]
+
+  - id: LNX-0004
+    title: The host keystore is found through the environment
+    statement: >
+      The Linux keystore shall be the file named by RH_KEYSTORE_FILE, else
+      `<RH_STATE_DIR>/keystore.bin`, else `<RH_SECURE_KEY_FILE>.keystore`; with
+      none of them set, loading shall find no key and storing shall be refused.
+    rationale: A host node keeps its rotated key beside its other state, and a process with no state directory must fall back to its compiled-in key rather than write somewhere unexpected.
+    satisfies: [SYS-0022]
+    status: proposed
+    verification: test
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [keystore, key-rotation]
+
+  - id: LNX-0005
+    title: The host keystore is owner-only and replaced atomically
+    statement: >
+      Storing a key on Linux shall write the two 40-byte A/B records of
+      robohub/keystore_core.h to `<file>.tmp`, created with mode 0600 (set
+      explicitly whatever the umask) and fsync'd, rename it over the file and
+      fsync the directory; a stale `<file>.tmp` shall not stop the write, and a
+      file torn short shall still load the record that is whole.
+    rationale: A crash during a key rotation must leave the old key or the new one, and a key must not be readable by another account.
+    satisfies: [SYS-0022, SYS-0033]
+    status: proposed
+    verification: test
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [keystore, security, secrets]
+
+  - id: LNX-0006
+    title: The UNO Q's Linux side is deployed to and its MCU flashed
+    statement: >
+      The arduino-uno-q board spec shall declare an aarch64 host built with
+      aarch64-linux-gnu-gcc, a deploy block that copies a program with rsync to
+      arduino@uno-q.local:/home/arduino/apps over SSH on port 22 and starts it
+      over SSH by the path it was copied to (`{artifact}`, the same in
+      target.json and the board manifest), with a docker block for an image
+      instead that runs it on the host's network and publishes no port, and a
+      flash block that writes the
+      STM32U585 companion with arduino-flasher-cli through the platform's
+      `tools/arduino-flasher-cli/flash`, which exits 127 with a message when that
+      flasher is missing.
+    rationale: One board with two halves is reached two ways, and the deploy and flash tools each read the half they are for.
+    satisfies: [SYS-0049]
+    status: proposed
+    verification: demonstration
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [board, deploy, flash, uno-q]
+
+  - id: LNX-0007
+    title: What a Linux deployment needs on the machine is declared
+    statement: >
+      The platform's manifest shall declare in `system_deps` the executables a
+      deployment from this machine uses — aarch64-linux-gnu-gcc, ssh, rsync,
+      arduino-flasher-cli and docker — each with the apt (and where there is one,
+      brew) package that provides it.
+    rationale: rho doctor and the keeper report what is missing before a deploy fails on it.
+    satisfies: [SYS-0004]
+    status: proposed
+    verification: inspection
+    owner: maintainer
+    changed: 2026-11-19
+    tags: [system-deps]

@@ -76,7 +76,10 @@ board:
     port: 22
     user: arduino
     path: /home/arduino/apps
-    run: "cd {artifact} && ./{artifact}"
+    # The same as target.json's `deploy.run`, which is what `rho deploy` reads
+    # (through rho-target): {artifact} is the full path the program was copied
+    # to, so it is started by that path alone.
+    run: "{artifact}"
   pins:
     uart_mcu_tx: {}
     uart_mcu_rx: {}
@@ -100,8 +103,9 @@ capabilities:
 
 # How a deployment reaches this board. `adb` is the UNO Q's USB shell, `arm64`
 # is the architecture the gateway is cross-built for, and `apps_dir` is where
-# a pushed gateway is started. A board that speaks SSH says `ssh` here and the
-# keeper uses the host and user saved in the network step.
+# a pushed gateway is started. RoboHub Mesh reads this block (`rho deploy` reads
+# target.json's `deploy` block, rsync over SSH). A board that speaks SSH says
+# `ssh` here and Mesh copies with scp to the host saved in the network step.
 deployment:
   kconfig: "CONFIG_RH_BOARD_ARDUINO_UNO_Q=y"
   method: "adb"

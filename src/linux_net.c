@@ -29,6 +29,7 @@
 
 static RoboHubNetStatus linux_status = ROBOHUB_NET_CONNECTED;
 
+// @req LNX-0002
 RoboHubError robohub_net_wifi_connect(const RoboHubWiFiConfig* config)
 {
     (void)config;
@@ -100,6 +101,7 @@ int robohub_socket_send(RoboHubSocket socket, const void* data, rh_size len)
     return (sent < 0) ? ROBOHUB_SOCKET_ERROR : (int)sent;
 }
 
+// @req LNX-0002
 int robohub_socket_recv(RoboHubSocket socket, void* data, rh_size len, rh_u32 timeout_ms)
 {
     if (socket == 0) {

@@ -13,6 +13,7 @@
 
 #include <sys/random.h>
 
+// @req LNX-0003
 int robohub_platform_nonce(rh_u8* out, rh_size length)
 {
     rh_size done = 0;

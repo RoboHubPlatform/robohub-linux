@@ -15,7 +15,7 @@ module:
   previous_ids:
     - robohub-linux
   type: platform
-  version: 0.3.0
+  version: 0.3.1
   description: >
     RoboHub platform for a Linux host: the console, the clock, a serial port and
     sockets, over POSIX. A host has no OneWire, I2C, SPI or GPIO, so those
@@ -26,6 +26,10 @@ module:
   created: "2026-10-13"
 
 platform: robohub
+
+# The platform's requirements are numbered LNX-NNNN and serve the system
+# requirements robohub holds.
+requirements: { prefix: LNX, parent: robohub }
 
 hardware:
   supported:
@@ -114,6 +118,6 @@ docs:
   title: RoboHub Linux Platform
   section: platforms
   order: "40"
-  index: docs/index.md
+  index: docs/doc/index.md
   sources:
-    - docs/index.md
+    - docs/doc/index.md

@@ -39,7 +39,7 @@ console every second.
 ## Deployment metadata
 
 The boards this platform carries say what a deployment may make of them and how
-the keeper reaches them:
+Mesh reaches them:
 
 ```yaml
 capabilities:
@@ -60,16 +60,21 @@ deployment:
 
 `native` is the machine running the build or the keeper; it is a host with UART,
 USB, Ethernet, WiFi and socket links. The UNO Q is a host gateway with WiFi and
-USB; its Ethernet is added by the USB-C dongle the board doesn't carry yet. The
-keeper prefers ADB for the UNO Q when it is connected over USB, and SSH for a
-board reached over the network.
+USB; its Ethernet is added by the USB-C dongle the board doesn't carry yet.
+
+Two tools deploy to the UNO Q, from two blocks. `rho deploy` reads the target
+spec's `deploy` block (`boards/arduino-uno-q/target.json`) and copies a program
+with rsync over SSH, then starts it over SSH. RoboHub Mesh reads the manifest's
+`deployment` block above and, because its method is `adb`, pushes the gateway
+over ADB on the USB cable; it does not fall back to SSH.
 
 ## Arduino UNO Q
 
 The UNO Q is two machines on one board: a Linux side that is deployed to, and a
 microcontroller that is flashed. The {ref}`bring-up runbook <robohub-linux/uno-q>` takes it from
-the box to a running program: reaching the board over USB (ADB) or the network
-(SSH), deploying a program or a container to its Linux side, and flashing its
+the box to a running program: reaching the board over the network (SSH, which
+`rho deploy` uses) or USB (ADB, which Mesh uses), deploying a program or a
+container to its Linux side, and flashing its
 MCU.
 
 ## The device keystore

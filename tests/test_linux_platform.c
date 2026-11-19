@@ -26,6 +26,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+// @verifies LNX-0001, LNX-0002, LNX-0003
 int main(void)
 {
     /* Nonces: filled, and never the same twice. */

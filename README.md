@@ -79,7 +79,7 @@ Build for the board with the cross compiler (`aarch64-linux-gnu-gcc`, named in
 the spec), or natively when the toolchain runs on the board itself.
 
 The full bring-up — first boot, SSH, deploying a program and the gateway
-container, and flashing the MCU — is in [docs/uno-q.md](docs/uno-q.md).
+container, and flashing the MCU — is in [docs/doc/uno-q.md](docs/doc/uno-q.md).
 
 ## Release history
 
