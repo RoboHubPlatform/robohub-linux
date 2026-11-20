@@ -30,3 +30,7 @@ port — that host mode is not enabled when the board is powered from 5V or VIN
 until the JCTL header is set as Arduino describes, and that the user running the
 program must be in `dialout`. `target.json` carries no capabilities and is
 unchanged.
+
+## [0.5.0] - 2026-11-20
+
+A host board takes updates (LNX-0009, robohub ADR-0022): robohub-common's update slot over two image files and a state file in `RH_UPDATE_DIR` (or `$RH_STATE_DIR/update`). Booting an image once records it as pending and ends the program (exit 75) so its supervisor starts it again; that start execs the image on trial; a later start that finds it still unconfirmed goes back to the confirmed slot and keeps "rolled back" for the managed layer to report. The board hook is now named on the link (`--undefined=robohub_board_register`): a program that referred to nothing else of the platform's object linked robohub-common's empty weak hook and started with no console or timer. `tests/test_linux_update.c` runs each start as a fresh process, with a copy of itself as the image.

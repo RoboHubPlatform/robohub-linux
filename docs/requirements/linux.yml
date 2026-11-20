@@ -137,3 +137,22 @@ requirements:
     owner: maintainer
     changed: 2026-11-20
     tags: [capabilities, usb, uno-q]
+
+  - id: LNX-0009
+    title: A Linux host board takes updates into two image files
+    statement: >
+      The Linux platform shall implement robohub-common's update slot contract
+      (COMM-0013) with two image files and a state file in the board's state
+      directory: an image is written to the file not running, booting it once
+      records it as pending and ends the program so its supervisor starts it
+      again, a start that finds a pending image runs it, a start after a pending
+      image that was never confirmed goes back to the other, and the security
+      version is kept in the state file.
+    rationale: The update path is tested end to end on a host before any chip's slots are touched (robohub ADR-0022, 8); a host node is also a real board that can be updated.
+    satisfies: [SYS-0072]
+    decided_by: [robohub:ADR-0022]
+    status: approved
+    verification: test
+    owner: maintainer
+    changed: 2026-11-20
+    tags: [updates, host]

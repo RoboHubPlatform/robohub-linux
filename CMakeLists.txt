@@ -58,6 +58,7 @@ add_library(robohub-linux STATIC
     src/linux_net.c
     src/linux_nonce.c
     src/linux_keystore.c
+    src/linux_update.c
 )
 
 target_include_directories(robohub-linux PUBLIC
@@ -76,6 +77,12 @@ target_link_libraries(robohub-linux PUBLIC robohub-common)
 # undefined pulls that object in, and its rh_keystore_load/store override the
 # weak defaults in robohub-common even if those were seen first.
 target_link_options(robohub-linux INTERFACE "LINKER:--undefined=rh_keystore_platform")
+# The same for the update slot (linux_update.c): two image files and a state file.
+target_link_options(robohub-linux INTERFACE "LINKER:--undefined=rh_update_platform")
+# And for the board hook robohub_platform_init calls (linux_platform.c): without
+# it, a program that names nothing else of that object links robohub-common's
+# empty weak hook, and starts with no console, no timer and no slot chosen.
+target_link_options(robohub-linux INTERFACE "LINKER:--undefined=robohub_board_register")
 target_compile_features(robohub-linux PUBLIC c_std_11)
 
 # ---------------------------------------------------------------------------
@@ -92,6 +99,10 @@ if(PROJECT_IS_TOP_LEVEL AND RHO_BUILD_HOST_TESTS AND NOT RHO_TARGET_IS_BAREMETAL
   add_executable(robohub-linux-test-keystore tests/test_linux_keystore.c)
   target_link_libraries(robohub-linux-test-keystore PRIVATE robohub-linux)
   add_test(NAME robohub-linux-test-keystore COMMAND robohub-linux-test-keystore)
+  # The update slot across real restarts: each start a fresh process.
+  add_executable(robohub-linux-test-update tests/test_linux_update.c)
+  target_link_libraries(robohub-linux-test-update PRIVATE robohub-linux)
+  add_test(NAME robohub-linux-test-update COMMAND robohub-linux-test-update)
 endif()
 
 # ---------------------------------------------------------------------------

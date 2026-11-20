@@ -397,9 +397,13 @@ static RoboHubError display_set_brightness(RoboHubDisplay* self, rh_u32 level)
     return ROBOHUB_OK;
 }
 
-// @req LNX-0001
+/* The slot this start runs (linux_update.c): may exec another image first. */
+void linux_update_start(void);
+
+// @req LNX-0001, LNX-0009
 RoboHubError robohub_board_register(void)
 {
+    linux_update_start();
     (void)robohub_console_init();
     (void)robohub_register_timer("system_timer", &linux_timer);
     (void)robohub_register_display("user_display", &linux_display);

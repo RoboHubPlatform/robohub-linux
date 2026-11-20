@@ -3,7 +3,7 @@
 # and runs them with the ctest kind.
 name: robohub-linux
 suites:
-  # @verifies LNX-0001, LNX-0002, LNX-0003, LNX-0004, LNX-0005
+  # @verifies LNX-0001, LNX-0002, LNX-0003, LNX-0004, LNX-0005, LNX-0009
   - name: unit
     kind: ctest
     tags: [unit, host]
