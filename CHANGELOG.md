@@ -34,3 +34,7 @@ unchanged.
 ## [0.5.0] - 2026-11-20
 
 A host board takes updates (LNX-0009, robohub ADR-0022): robohub-common's update slot over two image files and a state file in `RH_UPDATE_DIR` (or `$RH_STATE_DIR/update`). Booting an image once records it as pending and ends the program (exit 75) so its supervisor starts it again; that start execs the image on trial; a later start that finds it still unconfirmed goes back to the confirmed slot and keeps "rolled back" for the managed layer to report. The board hook is now named on the link (`--undefined=robohub_board_register`): a program that referred to nothing else of the platform's object linked robohub-common's empty weak hook and started with no console or timer. `tests/test_linux_update.c` runs each start as a fresh process, with a copy of itself as the image.
+
+## [0.5.1] - 2026-11-20
+
+`rh_update_reject()` on a host board (COMM-0014): the image on trial is given up, the outcome kept as rolled back, and the program ends (75) so its supervisor starts the confirmed slot again. Tested as a fourth start in `tests/test_linux_update.c`.

@@ -124,6 +124,18 @@ static int child(const char *name)
         assert(rh_update_security_version() == 3u);
         return 0;
     }
+    if (strcmp(name, "reject") == 0) {
+        /* Given up on trial: ends to be started again, never returning. */
+        assert(running_copy() && rh_update_pending(&info) && info.update_id == 43u);
+        (void)rh_update_reject();
+        return 1;
+    }
+    if (strcmp(name, "after-reject") == 0) {
+        assert(running_copy() && rh_update_running_slot() == 1);   /* 42's image, as kept */
+        assert(!rh_update_pending(0));
+        assert(rh_update_take_outcome(&info) == RH_UPDATE_ROLLED_BACK && info.update_id == 43u);
+        return 0;
+    }
     if (strcmp(name, "again") == 0) {
         /* A later start still runs it; the outcome was taken once. */
         assert(running_copy() && rh_update_running_slot() == 1);
@@ -158,6 +170,13 @@ int main(int argc, char **argv)
     assert(step("confirm") == 0);
     assert(step("kept") == 0);
     assert(step("again") == 0);
+
+    /* An image given up on trial (COMM-0014): written to slot 0 now, started on
+       trial, rejected, and the next start runs 42's again. */
+    setenv("TEST_UPDATE_ID", "43", 1);
+    assert(step("write") == 75);
+    assert(step("reject") == 75);
+    assert(step("after-reject") == 0);
 
     char cmd[256];
     snprintf(cmd, sizeof cmd, "rm -rf %s", dir);

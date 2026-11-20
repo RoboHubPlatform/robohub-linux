@@ -408,6 +408,26 @@ RoboHubError rh_update_confirm(void)
     return state_save() == 0 ? ROBOHUB_OK : ROBOHUB_ERR_IO;
 }
 
+/* Given up: the outcome is rolled back, the pending image forgotten, and the
+ * program ends so its supervisor starts the confirmed slot again. */
+// @req LNX-0009
+RoboHubError rh_update_reject(void)
+{
+    if (!rh_update_pending(0)) {
+        return ROBOHUB_ERR_STATE;
+    }
+    state.outcome = RH_UPDATE_ROLLED_BACK;
+    state.outcome_info = state.info;
+    state.pending = -1;
+    state.tried = 0;
+    trial = 0;
+    if (state_save() != 0) {
+        return ROBOHUB_ERR_IO;
+    }
+    fflush(0);
+    exit(LINUX_UPDATE_EXIT_RESTART);
+}
+
 // @req LNX-0009
 rh_update_outcome rh_update_take_outcome(rh_update_info *out)
 {
